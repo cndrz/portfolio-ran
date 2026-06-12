@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Admin — Stei Lanel</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            :root {
+                --bg: #f7f7f5;
+                --ink: #1a1a18;
+                --mid: #7a7a72;
+                --faint: #e4e4df;
+                --danger: #c0392b;
+                --success: #27ae60;
+                --panel: #fff;
+                --gap: clamp(1rem, 3vw, 2rem);
+            }
+
+            body {
+                background: var(--bg);
+                color: var(--ink);
+                font-family: "DM Sans", sans-serif;
+                font-weight: 300;
+                font-size: 0.9rem;
+                min-height: 100vh;
+            }
+
+            /* ── LOGIN SCREEN ── */
+            #login-screen {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+            }
+
+            .login-box {
+                width: 100%;
+                max-width: 400px;
+                background: var(--panel);
+                border: 1px solid var(--faint);
+                padding: 2.5rem;
+            }
+
+            .login-box h1 {
+                font-family: "DM Serif Display", serif;
+                font-size: 1.6rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .login-box p {
+                color: var(--mid);
+                font-size: 0.82rem;
+                margin-bottom: 2rem;
+            }
+
+            /* ── FORMS ── */
+            label {
+                display: block;
+                font-size: 0.72rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--mid);
+                margin-bottom: 0.4rem;
+            }
+
+            input[type="text"],
+            input[type="password"],
+            input[type="file"],
+            textarea {
+                width: 100%;
+                background: var(--bg);
+                border: 1px solid var(--faint);
+                padding: 0.65rem 0.8rem;
+                font-family: "DM Sans", sans-serif;
+                font-size: 0.88rem;
+                color: var(--ink);
+                outline: none;
+                transition: border-color 0.2s;
+                border-radius: 0;
+                appearance: none;
+            }
+
+            input:focus,
+            textarea:focus {
+                border-color: var(--ink);
+            }
+
+            .field {
+                margin-bottom: 1.2rem;
+            }
+
+            /* ── BUTTONS ── */
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                padding: 0.65rem 1.4rem;
+                font-family: "DM Sans", sans-serif;
+                font-size: 0.82rem;
+                letter-spacing: 0.08em;
+                cursor: pointer;
+                border: none;
+                transition:
+                    opacity 0.2s,
+                    background 0.2s;
+            }
+
+            .btn:disabled {
+                opacity: 0.45;
+                cursor: not-allowed;
+            }
+
+            .btn-primary {
+                background: var(--ink);
+                color: #fff;
+            }
+            .btn-primary:hover:not(:disabled) {
+                opacity: 0.82;
+            }
+
+            .btn-danger {
+                background: var(--danger);
+                color: #fff;
+            }
+            .btn-danger:hover:not(:disabled) {
+                opacity: 0.82;
+            }
+
+            .btn-ghost {
+                background: none;
+                border: 1px solid var(--faint);
+                color: var(--mid);
+            }
+            .btn-ghost:hover:not(:disabled) {
+                border-color: var(--ink);
+                color: var(--ink);
+            }
+
+            /* ── ADMIN LAYOUT ── */
+            #admin-screen {
+                display: none;
+            }
+
+            header {
+                border-bottom: 1px solid var(--faint);
+                padding: 1rem var(--gap);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: var(--panel);
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+
+            .header-name {
+                font-family: "DM Serif Display", serif;
+                font-size: 1.05rem;
+            }
+
+            .header-name span {
+                font-size: 0.72rem;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--mid);
+                font-family: "DM Sans", sans-serif;
+                margin-left: 0.6rem;
+            }
+
+            main {
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: var(--gap);
+                display: grid;
+                grid-template-columns: 340px 1fr;
+                gap: var(--gap);
+                align-items: start;
+            }
+
+            @media (max-width: 780px) {
+                main {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* ── UPLOAD PANEL ── */
+            .panel {
+                background: var(--panel);
+                border: 1px solid var(--faint);
+                padding: 1.5rem;
+            }
+
+            .panel-title {
+                font-family: "DM Serif Display", serif;
+                font-size: 1.15rem;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid var(--faint);
+            }
+
+            .drop-zone {
+                border: 1.5px dashed var(--faint);
+                padding: 2rem 1rem;
+                text-align: center;
+                cursor: pointer;
+                transition:
+                    border-color 0.2s,
+                    background 0.2s;
+                margin-bottom: 1.2rem;
+            }
+
+            .drop-zone:hover,
+            .drop-zone.drag-over {
+                border-color: var(--ink);
+                background: var(--bg);
+            }
+
+            .drop-zone input {
+                display: none;
+            }
+
+            .drop-zone-icon {
+                font-size: 1.8rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .drop-zone p {
+                font-size: 0.8rem;
+                color: var(--mid);
+                line-height: 1.5;
+            }
+
+            #preview-wrap {
+                margin-bottom: 1.2rem;
+                display: none;
+            }
+
+            #preview-wrap img {
+                width: 100%;
+                max-height: 200px;
+                object-fit: cover;
+                display: block;
+                border: 1px solid var(--faint);
+            }
+
+            /* ── WORKS LIST ── */
+            .works-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 1rem;
+            }
+
+            .work-card {
+                background: var(--panel);
+                border: 1px solid var(--faint);
+                overflow: hidden;
+                position: relative;
+            }
+
+            .work-card img {
+                width: 100%;
+                height: 160px;
+                object-fit: cover;
+                display: block;
+            }
+
+            .work-card-body {
+                padding: 0.75rem;
+            }
+
+            .work-card-title {
+                font-size: 0.85rem;
+                font-weight: 500;
+                margin-bottom: 0.25rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .work-card-tags {
+                font-size: 0.7rem;
+                color: var(--mid);
+                letter-spacing: 0.06em;
+                margin-bottom: 0.75rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .work-card-actions {
+                display: flex;
+                gap: 0.4rem;
+            }
+
+            .work-card-actions .btn {
+                padding: 0.4rem 0.7rem;
+                font-size: 0.75rem;
+                flex: 1;
+                justify-content: center;
+            }
+
+            /* ── EDIT MODAL ── */
+            .overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(26, 26, 24, 0.5);
+                z-index: 100;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+            }
+
+            .overlay.open {
+                display: flex;
+            }
+
+            .modal {
+                background: var(--panel);
+                border: 1px solid var(--faint);
+                padding: 2rem;
+                width: 100%;
+                max-width: 420px;
+            }
+
+            .modal-title {
+                font-family: "DM Serif Display", serif;
+                font-size: 1.2rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .modal-actions {
+                display: flex;
+                gap: 0.6rem;
+                margin-top: 1.5rem;
+            }
+
+            /* ── TOAST ── */
+            #toast {
+                position: fixed;
+                bottom: 2rem;
+                left: 50%;
+                transform: translateX(-50%) translateY(10px);
+                background: var(--ink);
+                color: #fff;
+                padding: 0.75rem 1.5rem;
+                font-size: 0.82rem;
+                opacity: 0;
+                transition:
+                    opacity 0.3s,
+                    transform 0.3s;
+                pointer-events: none;
+                white-space: nowrap;
+                z-index: 999;
+            }
+
+            #toast.show {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            #toast.error {
+                background: var(--danger);
+            }
+
+            /* ── EMPTY STATE ── */
+            .empty {
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 4rem 2rem;
+                color: var(--mid);
+            }
+
+            /* ── SPINNER ── */
+            .spinner {
+                display: inline-block;
+                width: 14px;
+                height: 14px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-top-color: #fff;
+                border-radius: 50%;
+                animation: spin 0.7s linear infinite;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- ═══════════════════════════════════════════════════════ LOGIN -->
+        <div id="login-screen">
+            <div class="login-box">
+                <h1>Admin Panel</h1>
+                <p>Enter your GitHub Personal Access Token to continue.</p>
+                <div class="field">
+                    <label for="pat-input">GitHub PAT</label>
+                    <input
+                        type="password"
+                        id="pat-input"
+                        placeholder="github_pat_..."
+                        autocomplete="off"
+                    />
+                </div>
+                <button
+                    class="btn btn-primary"
+                    id="login-btn"
+                    style="width: 100%"
+                >
+                    Sign in
+                </button>
+                <p
+                    style="
+                        margin-top: 1rem;
+                        font-size: 0.75rem;
+                        color: var(--mid);
+                    "
+                >
+                    Token is used only in this browser session and never stored.
+                </p>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ ADMIN -->
+        <div id="admin-screen">
+            <header>
+                <div class="header-name">Stei Lanel <span>Admin</span></div>
+                <button class="btn btn-ghost" id="logout-btn">Sign out</button>
+            </header>
+
+            <main>
+                <!-- UPLOAD PANEL -->
+                <aside>
+                    <div class="panel">
+                        <h2 class="panel-title">Upload a Work</h2>
+
+                        <div class="drop-zone" id="drop-zone">
+                            <input
+                                type="file"
+                                id="file-input"
+                                accept="image/*"
+                            />
+                            <div class="drop-zone-icon">🖼</div>
+                            <p>Drop an image here<br />or click to browse</p>
+                        </div>
+
+                        <div id="preview-wrap">
+                            <img id="preview-img" src="" alt="Preview" />
+                        </div>
+
+                        <div class="field">
+                            <label for="upload-title">Title</label>
+                            <input
+                                type="text"
+                                id="upload-title"
+                                placeholder="e.g. Forest Spirit"
+                            />
+                        </div>
+                        <div class="field">
+                            <label for="upload-tags"
+                                >Tags
+                                <span
+                                    style="
+                                        text-transform: none;
+                                        letter-spacing: 0;
+                                    "
+                                    >(comma-separated)</span
+                                ></label
+                            >
+                            <input
+                                type="text"
+                                id="upload-tags"
+                                placeholder="e.g. digital, fantasy"
+                            />
+                        </div>
+
+                        <button
+                            class="btn btn-primary"
+                            id="upload-btn"
+                            style="width: 100%"
+                            disabled
+                        >
+                            Upload Work
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- WORKS LIST -->
+                <section>
+                    <div
+                        style="
+                            display: flex;
+                            align-items: baseline;
+                            justify-content: space-between;
+                            margin-bottom: 1.2rem;
+                        "
+                    >
+                        <h2
+                            style="
+                                font-family:
+                                    &quot;DM Serif Display&quot;, serif;
+                                font-size: 1.4rem;
+                            "
+                        >
+                            All Works
+                        </h2>
+                        <span
+                            id="list-count"
+                            style="
+                                font-size: 0.75rem;
+                                letter-spacing: 0.1em;
+                                text-transform: uppercase;
+                                color: var(--mid);
+                            "
+                            >Loading…</span
+                        >
+                    </div>
+                    <div class="works-grid" id="works-grid">
+                        <div
+                            class="empty"
+                            style="padding: 3rem 0; color: var(--mid)"
+                        >
+                            Loading works…
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ EDIT MODAL -->
+        <div class="overlay" id="edit-overlay">
+            <div class="modal">
+                <h3 class="modal-title">Edit Work</h3>
+                <input type="hidden" id="edit-id" />
+                <input type="hidden" id="edit-filename" />
+                <div class="field">
+                    <label for="edit-title">Title</label>
+                    <input type="text" id="edit-title" />
+                </div>
+                <div class="field">
+                    <label for="edit-tags"
+                        >Tags
+                        <span style="text-transform: none; letter-spacing: 0"
+                            >(comma-separated)</span
+                        ></label
+                    >
+                    <input type="text" id="edit-tags" />
+                </div>
+                <div class="modal-actions">
+                    <button
+                        class="btn btn-ghost"
+                        id="edit-cancel"
+                        style="flex: 1"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        class="btn btn-primary"
+                        id="edit-save"
+                        style="flex: 1"
+                    >
+                        Save changes
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ TOAST -->
+        <div id="toast"></div>
+
+        <script>
+            // ── CONFIG ────────────────────────────────────────────────────────────────────
+            const GITHUB_USER = "cndrz";
+            const GITHUB_REPO = "portfolio-ran";
+            const BRANCH = "main";
+
+            const API = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}`;
+            const RAW = (p) =>
+                `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${BRANCH}/${p}`;
+
+            let TOKEN = "";
+            let works = [];
+            let selectedFile = null;
+
+            // ── AUTH ──────────────────────────────────────────────────────────────────────
+            document
+                .getElementById("login-btn")
+                .addEventListener("click", async () => {
+                    const pat = document
+                        .getElementById("pat-input")
+                        .value.trim();
+                    if (!pat) return;
+                    const btn = document.getElementById("login-btn");
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner"></span> Verifying…';
+
+                    try {
+                        const res = await fetch(
+                            `${API}/contents/data/works.json`,
+                            {
+                                headers: { Authorization: `Bearer ${pat}` },
+                            },
+                        );
+                        if (res.status === 401)
+                            throw new Error("Invalid token.");
+                        TOKEN = pat;
+                        document.getElementById("login-screen").style.display =
+                            "none";
+                        document.getElementById("admin-screen").style.display =
+                            "block";
+                        loadWorks();
+                    } catch (e) {
+                        toast(e.message || "Could not connect.", true);
+                        btn.disabled = false;
+                        btn.textContent = "Sign in";
+                    }
+                });
+
+            document
+                .getElementById("pat-input")
+                .addEventListener("keydown", (e) => {
+                    if (e.key === "Enter")
+                        document.getElementById("login-btn").click();
+                });
+
+            document
+                .getElementById("logout-btn")
+                .addEventListener("click", () => {
+                    TOKEN = "";
+                    works = [];
+                    document.getElementById("admin-screen").style.display =
+                        "none";
+                    document.getElementById("login-screen").style.display =
+                        "flex";
+                    document.getElementById("pat-input").value = "";
+                });
+
+            // ── HELPERS ───────────────────────────────────────────────────────────────────
+            function toast(msg, isError = false) {
+                const el = document.getElementById("toast");
+                el.textContent = msg;
+                el.className = "show" + (isError ? " error" : "");
+                setTimeout(() => {
+                    el.className = "";
+                }, 3000);
+            }
+
+            function headers() {
+                return {
+                    Authorization: `Bearer ${TOKEN}`,
+                    "Content-Type": "application/json",
+                };
+            }
+
+            async function getFileSHA(path) {
+                const res = await fetch(`${API}/contents/${path}`, {
+                    headers: headers(),
+                });
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data.sha;
+            }
+
+            async function saveWorks(newWorks) {
+                const sha = await getFileSHA("data/works.json");
+                const content = btoa(
+                    unescape(
+                        encodeURIComponent(JSON.stringify(newWorks, null, 2)),
+                    ),
+                );
+                const body = {
+                    message: "Update works.json",
+                    content,
+                    branch: BRANCH,
+                };
+                if (sha) body.sha = sha;
+                const res = await fetch(`${API}/contents/data/works.json`, {
+                    method: "PUT",
+                    headers: headers(),
+                    body: JSON.stringify(body),
+                });
+                if (!res.ok) throw new Error("Failed to save works.json");
+                works = newWorks;
+            }
+
+            // ── LOAD WORKS ────────────────────────────────────────────────────────────────
+            async function loadWorks() {
+                try {
+                    const res = await fetch(
+                        RAW("data/works.json") + "?t=" + Date.now(),
+                    );
+                    works = res.ok ? await res.json() : [];
+                } catch {
+                    works = [];
+                }
+                renderWorks();
+            }
+
+            function renderWorks() {
+                const grid = document.getElementById("works-grid");
+                const countEl = document.getElementById("list-count");
+                countEl.textContent = `${works.length} ${works.length === 1 ? "piece" : "pieces"}`;
+
+                if (works.length === 0) {
+                    grid.innerHTML =
+                        '<div class="empty">No works yet. Upload something above.</div>';
+                    return;
+                }
+
+                grid.innerHTML = "";
+                works.forEach((work) => {
+                    const imgUrl = RAW(`illustrations/${work.filename}`);
+                    const card = document.createElement("div");
+                    card.className = "work-card";
+                    card.innerHTML = `
+        <img src="${imgUrl}" alt="${work.title}" loading="lazy" />
+        <div class="work-card-body">
+          <div class="work-card-title">${work.title}</div>
+          <div class="work-card-tags">${work.tags?.join(", ") || "—"}</div>
+          <div class="work-card-actions">
+            <button class="btn btn-ghost" data-id="${work.id}" data-action="edit">Edit</button>
+            <button class="btn btn-danger" data-id="${work.id}" data-action="delete">Delete</button>
+          </div>
+        </div>
+      `;
+                    grid.appendChild(card);
+                });
+
+                grid.querySelectorAll('[data-action="edit"]').forEach((btn) =>
+                    btn.addEventListener("click", () =>
+                        openEdit(btn.dataset.id),
+                    ),
+                );
+                grid.querySelectorAll('[data-action="delete"]').forEach((btn) =>
+                    btn.addEventListener("click", () =>
+                        deleteWork(btn.dataset.id),
+                    ),
+                );
+            }
+
+            // ── UPLOAD ────────────────────────────────────────────────────────────────────
+            const dropZone = document.getElementById("drop-zone");
+            const fileInput = document.getElementById("file-input");
+
+            dropZone.addEventListener("click", () => fileInput.click());
+            dropZone.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                dropZone.classList.add("drag-over");
+            });
+            dropZone.addEventListener("dragleave", () =>
+                dropZone.classList.remove("drag-over"),
+            );
+            dropZone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                dropZone.classList.remove("drag-over");
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith("image/"))
+                    handleFileSelect(file);
+            });
+
+            fileInput.addEventListener("change", () => {
+                if (fileInput.files[0]) handleFileSelect(fileInput.files[0]);
+            });
+
+            function handleFileSelect(file) {
+                selectedFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById("preview-img").src =
+                        e.target.result;
+                    document.getElementById("preview-wrap").style.display =
+                        "block";
+                };
+                reader.readAsDataURL(file);
+                // Pre-fill title from filename
+                const name = file.name
+                    .replace(/\.[^.]+$/, "")
+                    .replace(/[-_]/g, " ");
+                if (!document.getElementById("upload-title").value) {
+                    document.getElementById("upload-title").value =
+                        name.charAt(0).toUpperCase() + name.slice(1);
+                }
+                document.getElementById("upload-btn").disabled = false;
+            }
+
+            document
+                .getElementById("upload-btn")
+                .addEventListener("click", async () => {
+                    if (!selectedFile) return;
+                    const title = document
+                        .getElementById("upload-title")
+                        .value.trim();
+                    if (!title) {
+                        toast("Please add a title.", true);
+                        return;
+                    }
+
+                    const btn = document.getElementById("upload-btn");
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner"></span> Uploading…';
+
+                    try {
+                        // 1. Build filename slug
+                        const ext = selectedFile.name
+                            .split(".")
+                            .pop()
+                            .toLowerCase();
+                        const slug = title
+                            .toLowerCase()
+                            .replace(/[^a-z0-9]+/g, "-")
+                            .replace(/^-|-$/g, "");
+                        const filename = `${slug}-${Date.now()}.${ext}`;
+
+                        // 2. Encode image to base64
+                        const base64 = await new Promise((res, rej) => {
+                            const r = new FileReader();
+                            r.onload = () => res(r.result.split(",")[1]);
+                            r.onerror = rej;
+                            r.readAsDataURL(selectedFile);
+                        });
+
+                        // 3. Upload image file
+                        const imgRes = await fetch(
+                            `${API}/contents/illustrations/${filename}`,
+                            {
+                                method: "PUT",
+                                headers: headers(),
+                                body: JSON.stringify({
+                                    message: `Add illustration: ${filename}`,
+                                    content: base64,
+                                    branch: BRANCH,
+                                }),
+                            },
+                        );
+                        if (!imgRes.ok) throw new Error("Image upload failed.");
+
+                        // 4. Update works.json
+                        const tagsRaw =
+                            document.getElementById("upload-tags").value;
+                        const tags = tagsRaw
+                            .split(",")
+                            .map((t) => t.trim())
+                            .filter(Boolean);
+                        const newWork = {
+                            id: Date.now().toString(),
+                            title,
+                            tags,
+                            filename,
+                            date: new Date().toISOString().slice(0, 10),
+                        };
+                        await saveWorks([newWork, ...works]);
+
+                        // 5. Reset form
+                        selectedFile = null;
+                        fileInput.value = "";
+                        document.getElementById("upload-title").value = "";
+                        document.getElementById("upload-tags").value = "";
+                        document.getElementById("preview-wrap").style.display =
+                            "none";
+                        btn.innerHTML = "Upload Work";
+
+                        toast("Work uploaded!");
+                        renderWorks();
+                    } catch (e) {
+                        toast(e.message || "Upload failed.", true);
+                        btn.disabled = false;
+                        btn.innerHTML = "Upload Work";
+                    }
+                });
+
+            // ── DELETE ────────────────────────────────────────────────────────────────────
+            async function deleteWork(id) {
+                const work = works.find((w) => w.id === id);
+                if (!work) return;
+                if (!confirm(`Delete "${work.title}"? This cannot be undone.`))
+                    return;
+
+                try {
+                    // 1. Delete image file from GitHub
+                    const sha = await getFileSHA(
+                        `illustrations/${work.filename}`,
+                    );
+                    if (sha) {
+                        const delRes = await fetch(
+                            `${API}/contents/illustrations/${work.filename}`,
+                            {
+                                method: "DELETE",
+                                headers: headers(),
+                                body: JSON.stringify({
+                                    message: `Delete illustration: ${work.filename}`,
+                                    sha,
+                                    branch: BRANCH,
+                                }),
+                            },
+                        );
+                        if (!delRes.ok)
+                            throw new Error("Could not delete image file.");
+                    }
+
+                    // 2. Update works.json
+                    await saveWorks(works.filter((w) => w.id !== id));
+
+                    toast("Work deleted.");
+                    renderWorks();
+                } catch (e) {
+                    toast(e.message || "Delete failed.", true);
+                }
+            }
+
+            // ── EDIT ──────────────────────────────────────────────────────────────────────
+            function openEdit(id) {
+                const work = works.find((w) => w.id === id);
+                if (!work) return;
+                document.getElementById("edit-id").value = id;
+                document.getElementById("edit-filename").value = work.filename;
+                document.getElementById("edit-title").value = work.title;
+                document.getElementById("edit-tags").value =
+                    work.tags?.join(", ") || "";
+                document.getElementById("edit-overlay").classList.add("open");
+            }
+
+            document
+                .getElementById("edit-cancel")
+                .addEventListener("click", () => {
+                    document
+                        .getElementById("edit-overlay")
+                        .classList.remove("open");
+                });
+
+            document
+                .getElementById("edit-overlay")
+                .addEventListener("click", (e) => {
+                    if (e.target === e.currentTarget)
+                        document
+                            .getElementById("edit-overlay")
+                            .classList.remove("open");
+                });
+
+            document
+                .getElementById("edit-save")
+                .addEventListener("click", async () => {
+                    const id = document.getElementById("edit-id").value;
+                    const title = document
+                        .getElementById("edit-title")
+                        .value.trim();
+                    if (!title) {
+                        toast("Title cannot be empty.", true);
+                        return;
+                    }
+
+                    const btn = document.getElementById("edit-save");
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner"></span>';
+
+                    try {
+                        const tagsRaw =
+                            document.getElementById("edit-tags").value;
+                        const tags = tagsRaw
+                            .split(",")
+                            .map((t) => t.trim())
+                            .filter(Boolean);
+                        const updated = works.map((w) =>
+                            w.id === id ? { ...w, title, tags } : w,
+                        );
+                        await saveWorks(updated);
+
+                        document
+                            .getElementById("edit-overlay")
+                            .classList.remove("open");
+                        toast("Changes saved.");
+                        renderWorks();
+                    } catch (e) {
+                        toast(e.message || "Save failed.", true);
+                    }
+
+                    btn.disabled = false;
+                    btn.textContent = "Save changes";
+                });
+        </script>
+    </body>
+</html>

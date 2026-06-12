@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Stei Lanel</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            :root {
+                --bg: #f7f7f5;
+                --ink: #1a1a18;
+                --mid: #7a7a72;
+                --faint: #e4e4df;
+                --accent: #1a1a18;
+                --gap: clamp(1.5rem, 4vw, 3rem);
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                background: var(--bg);
+                color: var(--ink);
+                font-family: "DM Sans", sans-serif;
+                font-weight: 300;
+                line-height: 1.6;
+                min-height: 100vh;
+            }
+
+            /* ── NAV ── */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 1.4rem var(--gap);
+                background: var(--bg);
+                border-bottom: 1px solid var(--faint);
+            }
+
+            .nav-name {
+                font-family: "DM Serif Display", serif;
+                font-size: 1.15rem;
+                letter-spacing: 0.01em;
+            }
+
+            .nav-links {
+                display: flex;
+                gap: 2rem;
+                list-style: none;
+            }
+
+            .nav-links a {
+                font-size: 0.8rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--mid);
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+
+            .nav-links a:hover {
+                color: var(--ink);
+            }
+
+            /* ── HERO ── */
+            .hero {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                padding: calc(var(--gap) * 2) var(--gap) var(--gap);
+            }
+
+            .hero-eyebrow {
+                font-size: 0.75rem;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: var(--mid);
+                margin-bottom: 1.2rem;
+            }
+
+            .hero-headline {
+                font-family: "DM Serif Display", serif;
+                font-size: clamp(3rem, 9vw, 7.5rem);
+                line-height: 1;
+                letter-spacing: -0.02em;
+                max-width: 14ch;
+            }
+
+            .hero-headline em {
+                font-style: italic;
+                color: var(--mid);
+            }
+
+            .hero-sub {
+                margin-top: 2rem;
+                max-width: 42ch;
+                font-size: 1rem;
+                color: var(--mid);
+                line-height: 1.75;
+            }
+
+            .hero-divider {
+                width: 100%;
+                height: 1px;
+                background: var(--faint);
+                margin-top: var(--gap);
+            }
+
+            /* ── WORKS SECTION ── */
+            .works {
+                padding: var(--gap);
+            }
+
+            .works-header {
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+                margin-bottom: calc(var(--gap) * 1.2);
+            }
+
+            .works-title {
+                font-family: "DM Serif Display", serif;
+                font-size: clamp(1.5rem, 3vw, 2.2rem);
+            }
+
+            .works-count {
+                font-size: 0.75rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--mid);
+            }
+
+            /* Masonry-ish grid */
+            .gallery {
+                columns: 2;
+                column-gap: 1.2rem;
+            }
+
+            @media (min-width: 900px) {
+                .gallery {
+                    columns: 3;
+                }
+            }
+            @media (max-width: 560px) {
+                .gallery {
+                    columns: 1;
+                }
+            }
+
+            .gallery-item {
+                break-inside: avoid;
+                margin-bottom: 1.2rem;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                background: var(--faint);
+            }
+
+            .gallery-item img {
+                width: 100%;
+                display: block;
+                transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+
+            .gallery-item:hover img {
+                transform: scale(1.03);
+            }
+
+            .gallery-item-info {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 1.2rem 1rem 1rem;
+                background: linear-gradient(transparent, rgba(26, 26, 24, 0.7));
+                color: #fff;
+                opacity: 0;
+                transform: translateY(6px);
+                transition:
+                    opacity 0.3s,
+                    transform 0.3s;
+            }
+
+            .gallery-item:hover .gallery-item-info {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .gallery-item-title {
+                font-family: "DM Serif Display", serif;
+                font-size: 1rem;
+                line-height: 1.2;
+            }
+
+            .gallery-item-tags {
+                margin-top: 0.3rem;
+                font-size: 0.7rem;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                opacity: 0.75;
+            }
+
+            /* Empty state */
+            .empty-state {
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 6rem 2rem;
+                color: var(--mid);
+            }
+
+            .empty-state p:first-child {
+                font-family: "DM Serif Display", serif;
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            /* ── LIGHTBOX ── */
+            .lightbox {
+                display: none;
+                position: fixed;
+                inset: 0;
+                z-index: 200;
+                background: rgba(26, 26, 24, 0.93);
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+            }
+
+            .lightbox.open {
+                display: flex;
+            }
+
+            .lightbox-inner {
+                position: relative;
+                max-width: 90vw;
+                max-height: 90vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .lightbox-inner img {
+                max-width: 100%;
+                max-height: 80vh;
+                object-fit: contain;
+                display: block;
+            }
+
+            .lightbox-caption {
+                color: rgba(255, 255, 255, 0.6);
+                font-size: 0.8rem;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
+
+            .lightbox-close {
+                position: fixed;
+                top: 1.5rem;
+                right: 1.5rem;
+                background: none;
+                border: none;
+                color: #fff;
+                font-size: 1.5rem;
+                cursor: pointer;
+                opacity: 0.6;
+                transition: opacity 0.2s;
+                line-height: 1;
+            }
+
+            .lightbox-close:hover {
+                opacity: 1;
+            }
+
+            /* ── ABOUT ── */
+            .about {
+                padding: calc(var(--gap) * 2) var(--gap);
+                border-top: 1px solid var(--faint);
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--gap);
+                align-items: start;
+            }
+
+            @media (max-width: 680px) {
+                .about {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .about-label {
+                font-size: 0.7rem;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: var(--mid);
+                margin-bottom: 1rem;
+            }
+
+            .about-heading {
+                font-family: "DM Serif Display", serif;
+                font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+                line-height: 1.15;
+            }
+
+            .about-body {
+                padding-top: 0.5rem;
+                color: var(--mid);
+                font-size: 0.95rem;
+                line-height: 1.85;
+            }
+
+            .about-body p + p {
+                margin-top: 1rem;
+            }
+
+            /* ── FOOTER ── */
+            footer {
+                border-top: 1px solid var(--faint);
+                padding: 2rem var(--gap);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 0.75rem;
+                color: var(--mid);
+                letter-spacing: 0.08em;
+            }
+
+            /* ── LOADING SKELETON ── */
+            .skeleton {
+                background: linear-gradient(
+                    90deg,
+                    var(--faint) 25%,
+                    #ddddd8 50%,
+                    var(--faint) 75%
+                );
+                background-size: 200% 100%;
+                animation: shimmer 1.4s infinite;
+                break-inside: avoid;
+                margin-bottom: 1.2rem;
+            }
+
+            @keyframes shimmer {
+                0% {
+                    background-position: 200% 0;
+                }
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .gallery-item img,
+                .gallery-item-info {
+                    transition: none;
+                }
+                .skeleton {
+                    animation: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <span class="nav-name">Stei Lanel</span>
+            <ul class="nav-links">
+                <li><a href="#works">Works</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </nav>
+
+        <!-- HERO -->
+        <section class="hero">
+            <p class="hero-eyebrow">Illustrations &amp; Studies</p>
+            <h1 class="hero-headline">
+                Still <em>learning,</em> always drawing.
+            </h1>
+            <p class="hero-sub">
+                Not here to impress — here to show the work that earned its
+                place. A collection of pieces that meant something to make.
+            </p>
+            <div class="hero-divider"></div>
+        </section>
+
+        <!-- WORKS -->
+        <section class="works" id="works">
+            <div class="works-header">
+                <h2 class="works-title">Selected Works</h2>
+                <span class="works-count" id="works-count">— pieces</span>
+            </div>
+            <div class="gallery" id="gallery">
+                <!-- Skeletons while loading -->
+                <div class="skeleton" style="height: 280px"></div>
+                <div class="skeleton" style="height: 380px"></div>
+                <div class="skeleton" style="height: 220px"></div>
+                <div class="skeleton" style="height: 320px"></div>
+                <div class="skeleton" style="height: 260px"></div>
+                <div class="skeleton" style="height: 400px"></div>
+            </div>
+        </section>
+
+        <!-- LIGHTBOX -->
+        <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+            <button
+                class="lightbox-close"
+                id="lightbox-close"
+                aria-label="Close"
+            >
+                ✕
+            </button>
+            <div class="lightbox-inner">
+                <img id="lightbox-img" src="" alt="" />
+                <p class="lightbox-caption" id="lightbox-caption"></p>
+            </div>
+        </div>
+
+        <!-- ABOUT -->
+        <section class="about" id="about">
+            <div>
+                <p class="about-label">About</p>
+                <h2 class="about-heading">
+                    Somewhere between a student and an artist.
+                </h2>
+            </div>
+            <div class="about-body">
+                <p>
+                    I am a teenager who draws — constantly, quietly, mostly for
+                    himself. Deep in the fundamentals: form, line, proportion.
+                    The kind of work that doesn't look like much until it
+                    suddenly does.
+                </p>
+                <p>
+                    This portfolio isn't a highlight reel. It's a record —
+                    pieces I am proud of, moments where something clicked. I'd
+                    rather stay in the background and let the work speak.
+                </p>
+            </div>
+        </section>
+
+        <footer>
+            <span>Stei Lanel</span>
+            <span>Illustrations &amp; Studies</span>
+        </footer>
+
+        <script>
+            // ── CONFIG ──────────────────────────────────────────────────────────────────
+            const GITHUB_USER = "cndrz";
+            const GITHUB_REPO = "portfolio-ran";
+            const BRANCH = "main";
+
+            const RAW = (path) =>
+                `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${BRANCH}/${path}`;
+
+            // ── FETCH WORKS ─────────────────────────────────────────────────────────────
+            async function loadWorks() {
+                const gallery = document.getElementById("gallery");
+                const countEl = document.getElementById("works-count");
+
+                try {
+                    const res = await fetch(
+                        RAW("data/works.json") + "?t=" + Date.now(),
+                    );
+                    if (!res.ok) throw new Error("not found");
+                    const works = await res.json();
+
+                    gallery.innerHTML = "";
+
+                    if (works.length === 0) {
+                        gallery.innerHTML = `
+            <div class="empty-state">
+              <p>Nothing here yet.</p>
+              <p>Check back soon.</p>
+            </div>`;
+                        countEl.textContent = "0 pieces";
+                        return;
+                    }
+
+                    countEl.textContent = `${works.length} ${works.length === 1 ? "piece" : "pieces"}`;
+
+                    works.forEach((work) => {
+                        const imgUrl = RAW(`illustrations/${work.filename}`);
+                        const item = document.createElement("div");
+                        item.className = "gallery-item";
+                        item.innerHTML = `
+            <img src="${imgUrl}" alt="${work.title}" loading="lazy" />
+            <div class="gallery-item-info">
+              <div class="gallery-item-title">${work.title}</div>
+              ${work.tags?.length ? `<div class="gallery-item-tags">${work.tags.join(" · ")}</div>` : ""}
+            </div>
+          `;
+                        item.addEventListener("click", () =>
+                            openLightbox(imgUrl, work.title, work.tags),
+                        );
+                        gallery.appendChild(item);
+                    });
+                } catch (e) {
+                    gallery.innerHTML = `
+          <div class="empty-state">
+            <p>Nothing here yet.</p>
+            <p>Works will appear once the gallery is set up.</p>
+          </div>`;
+                    countEl.textContent = "— pieces";
+                }
+            }
+
+            // ── LIGHTBOX ────────────────────────────────────────────────────────────────
+            function openLightbox(src, title, tags) {
+                const lb = document.getElementById("lightbox");
+                document.getElementById("lightbox-img").src = src;
+                document.getElementById("lightbox-img").alt = title;
+                document.getElementById("lightbox-caption").textContent =
+                    tags?.length ? `${title} · ${tags.join(", ")}` : title;
+                lb.classList.add("open");
+                document.body.style.overflow = "hidden";
+            }
+
+            function closeLightbox() {
+                document.getElementById("lightbox").classList.remove("open");
+                document.body.style.overflow = "";
+            }
+
+            document
+                .getElementById("lightbox-close")
+                .addEventListener("click", closeLightbox);
+            document
+                .getElementById("lightbox")
+                .addEventListener("click", (e) => {
+                    if (e.target === e.currentTarget) closeLightbox();
+                });
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") closeLightbox();
+            });
+
+            // ── INIT ────────────────────────────────────────────────────────────────────
+            loadWorks();
+        </script>
+    </body>
+</html>
